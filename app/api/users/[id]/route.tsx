@@ -53,13 +53,20 @@ export async function PUT(request:NextRequest, {params: {id} }:Props){
 }
 
 
-// export function DELETE(request:NextRequest, {params: {id} }:Props){
-//     //запрашиваем из бд пользователя с нужным id
-//     // если пользователя не существует то возвращаем 404
-//     if(id > 10 ){
-//         return NextResponse.json({error: "User not found"}, {status: 404})
-//     }
+export async function DELETE(request:NextRequest, {params: {id} }:Props){
+    //запрашиваем из бд пользователя с нужным id
+    // если пользователя не существует то возвращаем 404
+    const user = await prisma.user.findUnique({
+        where: {id: parseInt(id)}
+    })
+    if(!user){
+        return NextResponse.json({error: "User not found"}, {status: 404})
+    }
 
-//     // иначе удаляем пользователя и возврааем статус 200
-//     return NextResponse.json({})
-// }
+    // иначе удаляем пользователя и возврааем статус 200
+    const deleteUser = await prisma.user.delete({
+        where: {id: user.id}
+    })
+
+    return NextResponse.json(deleteUser,{status: 200})
+}
